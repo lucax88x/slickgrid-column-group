@@ -71,7 +71,7 @@
                     isEmpty = true;
                 }
 
-                slickColumns += '<div class="ui-state-default slick-header-column' + isEmpty ? ' slick-header-column-empty' : '' + '" data-group-name="' + name + '"style="width:' + (width) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
+                slickColumns += '<div class="ui-state-default slick-header-column' + (isEmpty ? ' slick-header-column-empty' : '') + '" data-group-name="' + name + '"style="width:' + (width) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
             });
             return slickColumns;
         }

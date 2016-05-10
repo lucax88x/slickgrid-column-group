@@ -64,8 +64,14 @@
                 var width = group.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
-                var displayName = (name === "-") ? " " : name;
-                slickColumns += '<div class="ui-state-default slick-header-column" data-group-name="' + name + '"style="width:' + (width) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
+                var displayName = name;
+                var isEmpty = false;
+                if (name === "-") {
+                    displayName = " ";
+                    isEmpty = true;
+                }
+
+                slickColumns += '<div class="ui-state-default slick-header-column' + isEmpty ? ' slick-header-column-empty' : '' + '" data-group-name="' + name + '"style="width:' + (width) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
             });
             return slickColumns;
         }

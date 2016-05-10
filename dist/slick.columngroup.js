@@ -5,6 +5,10 @@
         }
     });
 
+    var defaultOptions = {
+        groupsAreFirst: true
+    };
+
     function ColumnGroup() {
         var grid, $container, $groupHeaderColumns, self = this,
             isColumnGroupEnabled = false;
@@ -14,6 +18,7 @@
         function init(_grid) {
             grid = _grid;
             options = grid.getOptions();
+            options = $.extend(defaultOptions, options);
             $container = $(grid.getContainerNode());
             handler.subscribe(grid.onColumnsResized, onColumnsResized);
             handler.subscribe(grid.onColumnsReordered, onColumnsReordered);
@@ -86,7 +91,12 @@
             var groupNames = Object.keys(getGroupedColumns(columns));
             columns.forEach(function (column) {
                 column._groupIndex = groupNames.indexOf(column.groupName);
-                column._groupIndex = column._groupIndex === -1 ? groupNames.length : column._groupIndex;
+                if (options.groupsAreFirst) {
+                    column._groupIndex = column._groupIndex === -1 ? groupNames.length : column._groupIndex;
+                }
+                else {
+                    column._groupIndex = column._groupIndex === -1 ? -1 : column._groupIndex;
+                }
             });
         }
 

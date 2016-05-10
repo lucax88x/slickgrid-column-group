@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
     $.extend(true, window, {
         "Slick": {
             "ColumnGroup": ColumnGroup
@@ -9,16 +9,18 @@
         var grid, $container, $groupHeaderColumns, self = this,
             isColumnGroupEnabled = false;
         var handler = new Slick.EventHandler();
+        var options;
 
         function init(_grid) {
             grid = _grid;
+            options = grid.getOptions();
             $container = $(grid.getContainerNode());
             handler.subscribe(grid.onColumnsResized, onColumnsResized);
             handler.subscribe(grid.onColumnsReordered, onColumnsReordered);
         }
 
         function enableColumnGrouping() {
-            if(isColumnGroupEnabled) {
+            if (isColumnGroupEnabled) {
                 return;
             }
             isColumnGroupEnabled = true;
@@ -26,7 +28,7 @@
         }
 
         function removeColumnGrouping() {
-            if(!isColumnGroupEnabled) {
+            if (!isColumnGroupEnabled) {
                 return;
             }
             isColumnGroupEnabled = false;
@@ -57,58 +59,58 @@
         }
 
         function getGroupedColumnsTemplate(columnGroups) {
-            var slickColumns = "", borderWidth=2;
-            $.each(columnGroups, function(name , group) {
-                var width = group.reduce(function(width, column) {
+            var slickColumns = "";
+            $.each(columnGroups, function (name, group) {
+                var width = group.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
                 var displayName = (name === "-") ? " " : name;
-                slickColumns += '<div class="ui-state-default slick-header-column" data-group-name="' + name + '"style="width:' + (width-borderWidth) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
-                borderWidth = 1;
+                slickColumns += '<div class="ui-state-default slick-header-column" data-group-name="' + name + '"style="width:' + (width) + 'px"> <div class="slick-column-name">' + displayName + '</div></div>';
             });
             return slickColumns;
         }
 
         function setColumnIndex(columns) {
-            columns.forEach(function(column, index) {
+            columns.forEach(function (column, index) {
                 column._index = index;
             });
         }
 
         function setGroupIndex(columns) {
             var groupNames = Object.keys(getGroupedColumns(columns));
-            columns.forEach(function(column) {
+            columns.forEach(function (column) {
                 column._groupIndex = groupNames.indexOf(column.groupName);
                 column._groupIndex = column._groupIndex === -1 ? groupNames.length : column._groupIndex;
             });
         }
 
         function setupGroupColumnReorder() {
-            $groupHeaderColumns.sortable({
-                containment: "parent",
-                distance: 3,
-                axis: "x",
-                cursor: "default",
-                tolerance: "intersection",
-                helper: "clone",
-                update: onColumnsReordered
-            });
+            if (options.enableColumnReorder) {
+                $groupHeaderColumns.sortable({
+                    containment: "parent",
+                    distance: 3,
+                    axis: "x",
+                    cursor: "default",
+                    tolerance: "intersection",
+                    helper: "clone",
+                    update: onColumnsReordered
+                });
+            }
         }
 
         function onColumnsResized() {
-            var columns = grid.getColumns(), borderWidth=2;
+            var columns = grid.getColumns();
 
             if (!isColumnGroupEnabled) {
                 self.onColumnsResized.notify(columns);
                 return;
             }
 
-            $.each(getGroupedColumns(columns), function(name, group) {
-                var width = group.reduce(function(width, column) {
+            $.each(getGroupedColumns(columns), function (name, group) {
+                var width = group.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
-                $groupHeaderColumns.find("[data-group-name='" + name + "']").css("width", width-borderWidth);
-                borderWidth = 1;
+                $groupHeaderColumns.find("[data-group-name='" + name + "']").css("width", width);
             });
 
             self.onColumnsResized.notify(columns);
@@ -126,9 +128,9 @@
 
             var $columns = $(".slick-group-header-columns .slick-header-column");
             var columnGroups = getGroupedColumns(columns);
-            $columns.each(function(index, column) {
+            $columns.each(function (index, column) {
                 var groupedColumns = columnGroups[$(column).data("group-name")];
-                groupedColumns.forEach(function(groupedColumn) {
+                groupedColumns.forEach(function (groupedColumn) {
                     groupedColumn._groupIndex = index;
                 });
             });
@@ -144,7 +146,7 @@
 
         function getGroupedColumns(columns) {
             var groupedColumns = {};
-            columns.forEach(function(column) {
+            columns.forEach(function (column) {
                 var groupName = column.groupName || "-";
                 groupedColumns[groupName] = groupedColumns[groupName] || [];
                 groupedColumns[groupName].push(column);
@@ -169,4 +171,4 @@
         };
     }
 
-}(jQuery));
+} (jQuery));

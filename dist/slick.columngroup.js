@@ -51,14 +51,14 @@
 
             var columns = grid.getColumns();
             var columnGroups = getGroupedColumns(columns);
-            setGroupIndex(columns);
+            //setGroupIndex(columns);
             setColumnIndex(columns);
 
             $groupHeaderColumns.append(getGroupedColumnsTemplate(columnGroups));
             $container.find(".slick-header").prepend($groupHeaderColumns);
 
             setupGroupColumnReorder();
-            columns.sort(groupCompare);
+            //columns.sort(groupCompare);
             grid.setColumns(columns);
             grid.resizeCanvas();
         }
@@ -66,12 +66,13 @@
         function getGroupedColumnsTemplate(columnGroups) {
             var slickColumns = "";
             $.each(columnGroups, function (name, group) {
-                var width = group.reduce(function (width, column) {
+
+                var width = group.columns.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
                 var displayName = name;
                 var isEmpty = false;
-                if (name === "-") {
+                if (!group.isGroup) {
                     displayName = " ";
                     isEmpty = true;
                 }
@@ -87,18 +88,18 @@
             });
         }
 
-        function setGroupIndex(columns) {
-            var groupNames = Object.keys(getGroupedColumns(columns));
-            columns.forEach(function (column) {
-                column._groupIndex = groupNames.indexOf(column.groupName);
-                if (options.groupsAreFirst) {
-                    column._groupIndex = column._groupIndex === -1 ? groupNames.length : column._groupIndex;
-                }
-                else {
-                    column._groupIndex = column._groupIndex === -1 ? -1 : column._groupIndex;
-                }
-            });
-        }
+        // function setGroupIndex(columns) {
+        //     var groupNames = Object.keys(getGroupedColumns(columns));
+        //     columns.forEach(function (column) {
+        //         column._groupIndex = groupNames.indexOf(column.groupName);
+        //         if (options.groupsAreFirst) {
+        //             column._groupIndex = column._groupIndex === -1 ? groupNames.length : column._groupIndex;
+        //         }
+        //         else {
+        //             column._groupIndex = column._groupIndex === -1 ? -1 : column._groupIndex;
+        //         }
+        //     });
+        // }
 
         function setupGroupColumnReorder() {
             if (options.enableColumnReorder) {
@@ -123,7 +124,7 @@
             }
 
             $.each(getGroupedColumns(columns), function (name, group) {
-                var width = group.reduce(function (width, column) {
+                var width = group.columns.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
                 $groupHeaderColumns.find("[data-group-name='" + name + "']").css("width", width);
@@ -142,30 +143,30 @@
                 return;
             }
 
-            var $columns = $(".slick-group-header-columns .slick-header-column");
-            var columnGroups = getGroupedColumns(columns);
-            $columns.each(function (index, column) {
-                var groupedColumns = columnGroups[$(column).data("group-name")];
-                groupedColumns.forEach(function (groupedColumn) {
-                    groupedColumn._groupIndex = index;
-                });
-            });
-            columns.sort(groupCompare);
+            // var $columns = $(".slick-group-header-columns .slick-header-column");
+            // var columnGroups = getGroupedColumns(columns);
+            // $columns.each(function (index, column) {
+            //     var groupedColumns = columnGroups[$(column).data("group-name")];
+            //     groupedColumns.columns.forEach(function (groupedColumn) {
+            //         groupedColumn._groupIndex = index;
+            //     });
+            // });
+            //columns.sort(groupCompare);
             grid.setColumns(columns);
             setColumnIndex(columns);
             self.onColumnsReordered.notify(columns);
         }
 
-        function groupCompare(c1, c2) {
-            return (c1._groupIndex - c2._groupIndex) || (c1._index - c2._index);
-        }
+        // function groupCompare(c1, c2) {
+        //     return (c1._groupIndex - c2._groupIndex) || (c1._index - c2._index);
+        // }
 
         function getGroupedColumns(columns) {
             var groupedColumns = {};
             columns.forEach(function (column) {
-                var groupName = column.groupName || "-";
-                groupedColumns[groupName] = groupedColumns[groupName] || [];
-                groupedColumns[groupName].push(column);
+                var groupName = column.groupName || column.field;
+                groupedColumns[groupName] = groupedColumns[groupName] || { columns: [], isGroup: column.groupName ? true : false };
+                groupedColumns[groupName].columns.push(column);
             });
             return groupedColumns;
         }

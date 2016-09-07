@@ -115,7 +115,7 @@
             }
         }
 
-        function onColumnsResized() {
+        function resizeCanvas() {
             var columns = grid.getColumns();
 
             if (!isColumnGroupEnabled) {
@@ -127,8 +127,16 @@
                 var width = group.columns.reduce(function (width, column) {
                     return width + column.width;
                 }, 0);
+
                 $groupHeaderColumns.find("[data-group-name='" + name + "']").css("width", width);
             });
+
+            var headerColumns = $container.find(".slick-header-columns");
+            $groupHeaderColumns.css("width", headerColumns.width() + "px");
+        }
+
+        function onColumnsResized() {
+            resizeCanvas();
 
             self.onColumnsResized.notify(columns);
         }
@@ -184,7 +192,8 @@
             onColumnsReordered: this.onColumnsReordered,
             onColumnsResized: this.onColumnsResized,
             enableColumnGrouping: enableColumnGrouping,
-            removeColumnGrouping: removeColumnGrouping
+            removeColumnGrouping: removeColumnGrouping,
+            resizeCanvas: resizeCanvas
         };
     }
 
